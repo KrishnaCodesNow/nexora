@@ -1,16 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextAreaAutosize from "react-textarea-autosize";
 import { ArrowUpIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import z from "zod";
+import { toast } from "sonner";
+import { z } from "zod";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
+import { onInvoke } from "../actions";
 
 const formSchema = z.object({
   content: z
@@ -23,7 +25,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "🎬",
     title: "Build a Netflix clone",
-    glowColor: "group-hover:border-red-500/50 group-hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]",
+    glowColor:
+      "group-hover:border-red-500/50 group-hover:shadow-[0_0_20px_rgba(239,68,68,0.2)]",
     gradient: "from-red-500/15 via-rose-500/5 to-transparent",
     iconBg: "group-hover:bg-red-500/10",
     prompt:
@@ -32,7 +35,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "📦",
     title: "Build an admin dashboard",
-    glowColor: "group-hover:border-blue-500/50 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]",
+    glowColor:
+      "group-hover:border-blue-500/50 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]",
     gradient: "from-blue-500/15 via-cyan-500/5 to-transparent",
     iconBg: "group-hover:bg-blue-500/10",
     prompt:
@@ -41,7 +45,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "📋",
     title: "Build a kanban board",
-    glowColor: "group-hover:border-emerald-500/50 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]",
+    glowColor:
+      "group-hover:border-emerald-500/50 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]",
     gradient: "from-emerald-500/15 via-teal-500/5 to-transparent",
     iconBg: "group-hover:bg-emerald-500/10",
     prompt:
@@ -50,7 +55,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "🗂️",
     title: "Build a file manager",
-    glowColor: "group-hover:border-amber-500/50 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]",
+    glowColor:
+      "group-hover:border-amber-500/50 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.2)]",
     gradient: "from-amber-500/15 via-yellow-500/5 to-transparent",
     iconBg: "group-hover:bg-amber-500/10",
     prompt:
@@ -59,7 +65,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "📺",
     title: "Build a YouTube clone",
-    glowColor: "group-hover:border-rose-500/50 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.2)]",
+    glowColor:
+      "group-hover:border-rose-500/50 group-hover:shadow-[0_0_20px_rgba(244,63,94,0.2)]",
     gradient: "from-rose-500/15 via-orange-500/5 to-transparent",
     iconBg: "group-hover:bg-rose-500/10",
     prompt:
@@ -68,7 +75,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "🛍️",
     title: "Build a store page",
-    glowColor: "group-hover:border-violet-500/50 group-hover:shadow-[0_0_20px_rgba(139,92,246,0.2)]",
+    glowColor:
+      "group-hover:border-violet-500/50 group-hover:shadow-[0_0_20px_rgba(139,92,246,0.2)]",
     gradient: "from-violet-500/15 via-purple-500/5 to-transparent",
     iconBg: "group-hover:bg-violet-500/10",
     prompt:
@@ -77,7 +85,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "🏡",
     title: "Build an Airbnb clone",
-    glowColor: "group-hover:border-pink-500/50 group-hover:shadow-[0_0_20px_rgba(236,72,153,0.2)]",
+    glowColor:
+      "group-hover:border-pink-500/50 group-hover:shadow-[0_0_20px_rgba(236,72,153,0.2)]",
     gradient: "from-pink-500/15 via-rose-500/5 to-transparent",
     iconBg: "group-hover:bg-pink-500/10",
     prompt:
@@ -86,7 +95,8 @@ const PROJECT_TEMPLATES = [
   {
     emoji: "🎵",
     title: "Build a Spotify clone",
-    glowColor: "group-hover:border-green-500/50 group-hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]",
+    glowColor:
+      "group-hover:border-green-500/50 group-hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]",
     gradient: "from-green-500/15 via-emerald-500/5 to-transparent",
     iconBg: "group-hover:bg-green-500/10",
     prompt:
@@ -119,9 +129,23 @@ const ProjectsForm = () => {
     }
   };
 
+  const onInvokeAI = async () => {
+    try {
+      const res = await onInvoke();
+      console.log(res);
+      toast.success("Done");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Template Grid */}
+      <Button onClick={onInvokeAI}>
+        Invoke AI Agent
+      </Button>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {PROJECT_TEMPLATES.map((template, index) => (
           <button
@@ -210,7 +234,7 @@ const ProjectsForm = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
                       e.preventDefault();
-                      form.handleSubmit(onSubmit)(e);
+                      form.handleSubmit(onSubmit)();
                     }
                   }}
                 />
